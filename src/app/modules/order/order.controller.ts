@@ -14,62 +14,86 @@ export const createOrder = async (
     const { email, product: productId, quantity, totalPrice } = req.body;
 
     // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || !emailRegex.test(email)) {
-      const error = new Error('Invalid email address') as any;
-      error.status = 400;
-      throw error;
+    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // if (!email || !emailRegex.test(email)) {
+    //   const error = new Error('Invalid email address') as AppError;
+    //   error.status = 400;
+    //   throw error;
+    // }
+
+    // // Validate product ID format
+    // if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
+    //   const error = new Error('Invalid product ID') as AppError;
+    //   error.status = 400;
+    //   throw error;
+    // }
+
+    // // Validate quantity
+    // if (!quantity || typeof quantity !== 'number' || quantity <= 0) {
+    //   const error = new Error(
+    //     'Invalid quantity. It must be a positive number.',
+    //   ) as AppError;
+    //   error.status = 400;
+    //   throw error;
+    // }
+
+    // // Validate total price
+    // if (!totalPrice || typeof totalPrice !== 'number' || totalPrice <= 0) {
+    //   const error = new Error(
+    //     'Invalid total price. It must be a positive number.',
+    //   ) as AppError;
+    //   error.status = 400;
+    //   throw error;
+    // }
+
+    // Find the product
+    // Helper functions for validation
+    const isValidEmail = (email: string): boolean =>
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    // Validate email
+    if (!email || !isValidEmail(email)) {
+      throw new AppError('Invalid email address', 400);
     }
 
-    // Validate product ID format
+    // Validate product ID
     if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
-      const error = new Error('Invalid product ID') as AppError;
-      error.status = 400;
-      throw error;
+      throw new AppError('Invalid product ID', 400);
     }
 
     // Validate quantity
     if (!quantity || typeof quantity !== 'number' || quantity <= 0) {
-      const error = new Error(
+      throw new AppError(
         'Invalid quantity. It must be a positive number.',
-      ) as any;
-      error.status = 400;
-      throw error;
+        400,
+      );
     }
 
     // Validate total price
     if (!totalPrice || typeof totalPrice !== 'number' || totalPrice <= 0) {
-      const error = new Error(
+      throw new AppError(
         'Invalid total price. It must be a positive number.',
-      ) as any;
-      error.status = 400;
-      throw error;
+        400,
+      );
     }
-
-    // Find the product
+    // Find product
     const product = await Product.findById(productId);
 
     if (!product) {
-      const error = new Error('Product not found') as any;
-      error.status = 404;
-      throw error;
-    }
-
-    // Check if total price matches expected price
-    const expectedPrice = product.price * quantity;
-    if (totalPrice !== expectedPrice) {
-      const error = new Error(
-        `Total price mismatch. Expected: ${expectedPrice}`,
-      ) as any;
-      error.status = 400;
-      throw error;
+      throw new AppError('Product not found', 404);
     }
 
     // Check stock availability
     if (product.quantity < quantity) {
-      const error = new Error('Insufficient stock available') as any;
-      error.status = 400;
-      throw error;
+      throw new AppError('Insufficient stock available', 400);
+    }
+    // Check if total price matches expected price
+    const expectedPrice = product.price * quantity;
+    if (totalPrice !== expectedPrice) {
+      throw new AppError(
+        `Total price mismatch. Expected: ${expectedPrice}`,
+        400,
+      );
     }
 
     // Reduce product quantity and update stock status

@@ -22,9 +22,7 @@ export const createProduct = async (
     });
   } catch (error: unknown) {
     if (error instanceof mongoose.Error.ValidationError) {
-      const appError: AppError = new Error('Validation failed') as AppError;
-      appError.status = 400;
-      appError.errors = error.errors;
+      const appError = new AppError('Validation failed', 400, error.errors);
       return next(appError);
     }
     next(error);
@@ -72,17 +70,13 @@ export const getProductById = async (
     const { productId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(productId)) {
-      const error = new Error('Invalid product ID') as AppError;
-      error.status = 400;
-      throw error;
+      throw new AppError('Invalid product ID', 400);
     }
 
     const product = await Product.findById(productId);
 
     if (!product) {
-      const error = new Error('Product not found') as AppError;
-      error.status = 404;
-      throw error;
+      throw new AppError('Product not found', 404);
     }
 
     res.status(200).json({
@@ -106,9 +100,7 @@ export const updateProduct = async (
     const { productId } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(productId)) {
-      const error = new Error('Invalid Product ID') as AppError;
-      error.status = 404;
-      throw error;
+      throw new AppError('Invalid product ID', 400);
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -121,9 +113,7 @@ export const updateProduct = async (
     );
 
     if (!updatedProduct) {
-      const error = new Error('Product not found') as AppError;
-      error.status = 404;
-      throw error;
+      throw new AppError('Product not found', 404);
     }
     res.status(200).json({
       message: 'Product updated successfully',
@@ -132,12 +122,10 @@ export const updateProduct = async (
     });
   } catch (error: unknown) {
     if (error instanceof mongoose.Error.ValidationError) {
-      const appError: AppError = new Error('Validation failed') as AppError;
-      appError.status = 400;
-      appError.errors = error.errors; // Include detailed validation errors
+      const appError = new AppError('Validation failed', 400, error.errors);
       return next(appError);
     }
-    next(error); // Pass other errors to the global error handler
+    next(error);
   }
 };
 export const deleteProduct = async (
@@ -150,18 +138,14 @@ export const deleteProduct = async (
 
     // Validate if the provided ID is a valid MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(productId)) {
-      const error = new Error('Invalid product ID') as AppError;
-      error.status = 400;
-      throw error; // Throw the error to be handled by the errorHandler
+      throw new AppError('Invalid product ID', 400);
     }
 
     // Attempt to find and delete the product
     const deletedProduct = await Product.findByIdAndDelete(productId);
 
     if (!deletedProduct) {
-      const error = new Error('Product not found') as AppError;
-      error.status = 404;
-      throw error; // Throw the error to be handled by the errorHandler
+      throw new AppError('Product not found', 404);
     }
 
     res.status(200).json({
