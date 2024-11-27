@@ -1,15 +1,31 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from 'express';
 
-export default (
-  err: any,
-  _req: Request,
+export interface AppError extends Error {
+  status?: number;
+  success?: boolean;
+  errors?: any;
+}
+
+export const errorHandler = (
+  err: AppError,
+  req: Request,
   res: Response,
-  _next: NextFunction
-) => {
-  res.status(err.status || 500).json({
-    message: err.message || "Internal Server Error",
+  next: NextFunction,
+): void => {
+  const statusCode = err.status || 500; // Default to 500 if no status is set
+  const isProduction = process.env.NODE_ENV === 'production';
+
+  // Log error details
+  console.error(`Error on ${req.method} ${req.url}:`, err);
+
+  // Build error response
+  const errorResponse = {
+    message: err.message || 'Internal Server Error',
     success: false,
-    error: err,
-    stack: process.env.NODE_ENV === "production" ? null : err.stack,
-  });
+    error: isProduction ? err.name : err.errors || err, // Include error details in non-production
+    stack: isProduction ? undefined : err.stack, // Include stack trace in non-production
+  };
+
+  // Send response
+  res.status(statusCode).json(errorResponse);
 };
