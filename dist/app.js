@@ -32,11 +32,12 @@ app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.use('/api/products', product_route_1.default);
 app.use('/api/orders', order_route_1.default);
-// app.use((req, res, next) => {
-//   console.log(`Incoming ${req.method} request to ${req.url}`);
-//   console.log('Request body:', req.body);
-//   next();
-// });
+app.use((req, res, next) => {
+    res.send('Welcome');
+    console.log(`Incoming ${req.method} request to ${req.url}`);
+    console.log('Request body:', req.body);
+    next();
+});
 app.use(ErrorHandler_1.errorHandler);
 console.log(`Current working directory: ${process.cwd()}`);
 exports.default = app;
