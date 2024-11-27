@@ -24,10 +24,10 @@ export const createProduct = async (
     if (error instanceof mongoose.Error.ValidationError) {
       const appError: AppError = new Error('Validation failed') as AppError;
       appError.status = 400;
-      appError.errors = error.errors; // Include detailed validation errors
+      appError.errors = error.errors;
       return next(appError);
     }
-    next(error); // Pass other errors to the global error handler
+    next(error);
   }
 };
 

@@ -13,7 +13,11 @@ export default [
     rules: {
       'no-unused-vars': 'warn',
       'no-undef': 'warn',
-      ' no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': 'warn',
     },
+  },
+  {
+    ignores: ['**/node_mpdules', '**/dist', '**/.env'],
   },
 ];

@@ -95,3 +95,11 @@ Use tools like Postman or curl to interact with the API.
 
 - Place an Order -----------POST----- /api/orders -------------------{ email, product, quantity, totalPrice }-----------------
 - Calculate Total Revenue-- GET ------/api/orders/revenue ----------------------------------------------------
+
+## Contribution:
+
+# Contributions are welcome! Follow these steps:
+
+- Fork the repository and create a feature branch.
+- Commit your changes with clear messages.
+- Create a pull request with a detailed description of your changes.
