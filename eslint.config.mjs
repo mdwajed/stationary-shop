@@ -13,8 +13,7 @@ export default [
     rules: {
       'no-unused-vars': 'warn',
       'no-undef': 'warn',
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unused-vars': 'warn',
+      'no-explicit-any': 'off',
     },
   },
   {

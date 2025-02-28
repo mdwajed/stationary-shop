@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProduct = exports.updateProduct = exports.getProductById = exports.getAllProducts = exports.createProduct = void 0;
 const productModel_1 = require("../productModel");
 const mongoose_1 = __importDefault(require("mongoose"));
+const ErrorHandler_1 = require("../../../middleware/ErrorHandler");
 const createProduct = async (req, res, next) => {
     try {
         console.log('Request Body:', req.body);
@@ -21,9 +22,7 @@ const createProduct = async (req, res, next) => {
     }
     catch (error) {
         if (error instanceof mongoose_1.default.Error.ValidationError) {
-            const appError = new Error('Validation failed');
-            appError.status = 400;
-            appError.errors = error.errors;
+            const appError = new ErrorHandler_1.AppError('Validation failed', 400, error.errors);
             return next(appError);
         }
         next(error);
@@ -61,15 +60,11 @@ const getProductById = async (req, res, next) => {
     try {
         const { productId } = req.params;
         if (!mongoose_1.default.Types.ObjectId.isValid(productId)) {
-            const error = new Error('Invalid product ID');
-            error.status = 400;
-            throw error;
+            throw new ErrorHandler_1.AppError('Invalid product ID', 400);
         }
         const product = await productModel_1.Product.findById(productId);
         if (!product) {
-            const error = new Error('Product not found');
-            error.status = 404;
-            throw error;
+            throw new ErrorHandler_1.AppError('Product not found', 404);
         }
         res.status(200).json({
             message: 'Product retrieved successfully',
@@ -87,18 +82,14 @@ const updateProduct = async (req, res, next) => {
     try {
         const { productId } = req.params;
         if (!mongoose_1.default.Types.ObjectId.isValid(productId)) {
-            const error = new Error('Invalid Product ID');
-            error.status = 404;
-            throw error;
+            throw new ErrorHandler_1.AppError('Invalid product ID', 400);
         }
         const updatedProduct = await productModel_1.Product.findByIdAndUpdate(productId, req.body, {
             new: true,
             runValidators: true,
         });
         if (!updatedProduct) {
-            const error = new Error('Product not found');
-            error.status = 404;
-            throw error;
+            throw new ErrorHandler_1.AppError('Product not found', 404);
         }
         res.status(200).json({
             message: 'Product updated successfully',
@@ -108,12 +99,10 @@ const updateProduct = async (req, res, next) => {
     }
     catch (error) {
         if (error instanceof mongoose_1.default.Error.ValidationError) {
-            const appError = new Error('Validation failed');
-            appError.status = 400;
-            appError.errors = error.errors; // Include detailed validation errors
+            const appError = new ErrorHandler_1.AppError('Validation failed', 400, error.errors);
             return next(appError);
         }
-        next(error); // Pass other errors to the global error handler
+        next(error);
     }
 };
 exports.updateProduct = updateProduct;
@@ -122,16 +111,12 @@ const deleteProduct = async (req, res, next) => {
         const { productId } = req.params;
         // Validate if the provided ID is a valid MongoDB ObjectId
         if (!mongoose_1.default.Types.ObjectId.isValid(productId)) {
-            const error = new Error('Invalid product ID');
-            error.status = 400;
-            throw error; // Throw the error to be handled by the errorHandler
+            throw new ErrorHandler_1.AppError('Invalid product ID', 400);
         }
         // Attempt to find and delete the product
         const deletedProduct = await productModel_1.Product.findByIdAndDelete(productId);
         if (!deletedProduct) {
-            const error = new Error('Product not found');
-            error.status = 404;
-            throw error; // Throw the error to be handled by the errorHandler
+            throw new ErrorHandler_1.AppError('Product not found', 404);
         }
         res.status(200).json({
             message: 'Product deleted successfully',

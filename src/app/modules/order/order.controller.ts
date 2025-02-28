@@ -13,41 +13,6 @@ export const createOrder = async (
   try {
     const { email, product: productId, quantity, totalPrice } = req.body;
 
-    // Validate email format
-    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    // if (!email || !emailRegex.test(email)) {
-    //   const error = new Error('Invalid email address') as AppError;
-    //   error.status = 400;
-    //   throw error;
-    // }
-
-    // // Validate product ID format
-    // if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
-    //   const error = new Error('Invalid product ID') as AppError;
-    //   error.status = 400;
-    //   throw error;
-    // }
-
-    // // Validate quantity
-    // if (!quantity || typeof quantity !== 'number' || quantity <= 0) {
-    //   const error = new Error(
-    //     'Invalid quantity. It must be a positive number.',
-    //   ) as AppError;
-    //   error.status = 400;
-    //   throw error;
-    // }
-
-    // // Validate total price
-    // if (!totalPrice || typeof totalPrice !== 'number' || totalPrice <= 0) {
-    //   const error = new Error(
-    //     'Invalid total price. It must be a positive number.',
-    //   ) as AppError;
-    //   error.status = 400;
-    //   throw error;
-    // }
-
-    // Find the product
-    // Helper functions for validation
     const isValidEmail = (email: string): boolean =>
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
